@@ -4875,7 +4875,7 @@ if (coords.length > 1) {
 
  <Modal open={true}>
     <Box sx={{ width: "350px", height:"800px", padding: "20px", backgroundColor: "white", position: "fixed", top: "65%", right: "-250px", transform: "translate(-50%, -50%)" }}>
-        <h3>Enter location to Search</h3>
+        {/* <h3>Enter location to Search</h3> */}
         <Autocomplete
             options={searchResults}
             getOptionLabel={(option) => option.label}
