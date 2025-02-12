@@ -4873,23 +4873,80 @@ if (coords.length > 1) {
 //                 </Box>
 //             </Modal>
 
- <Modal open={true}>
-    <Box sx={{ width: "350px", height:"800px", padding: "20px", backgroundColor: "white", position: "fixed", top: "70%", right: "-250px", transform: "translate(-50%, -50%)" }}>
-        {/* <h3>Enter location to Search</h3> */}
+//  <Modal open={true}>
+//     <Box sx={{ width: "350px", height:"800px", padding: "20px", backgroundColor: "white", position: "fixed", top: "70%", right: "-250px", transform: "translate(-50%, -50%)" }}>
+//         {/* <h3>Enter location to Search</h3> */}
+//         <Autocomplete
+//             options={searchResults}
+//             getOptionLabel={(option) => option.label}
+//             onInputChange={(event, newInputValue) => searchPlace(newInputValue)}
+        
+//             onChange={(event, newValue) => {
+//                 if (newValue) {
+//                     setFormValues({
+//                         lat: newValue.lat.toString(),
+//                         lon: newValue.lon.toString(),
+//                         name: newValue.label,
+//                         icon: getDefaultIcon(newValue.label),
+//                     });
+            
+//                     // Move the map to the selected location
+//                     if (mapRef.current) {
+//                         mapRef.current.getView().animate({
+//                             center: fromLonLat([newValue.lon, newValue.lat]),
+//                             zoom: 5, // Adjust zoom level as needed
+//                             duration: 1000, // Smooth animation effect
+//                         });
+//                     }
+//                 }
+//             }}
+            
+//             renderInput={(params) => <TextField {...params} label="Search Places" fullWidth />}
+//         />
+//         <h3>Enter Latitude</h3>
+//         <TextField label="Latitude" fullWidth value={formValues.lat} onChange={(e) => setFormValues({ ...formValues, lat: e.target.value })} />
+//         <h3>Enter Longitude</h3>
+//         <TextField label="Longitude" fullWidth value={formValues.lon} onChange={(e) => setFormValues({ ...formValues, lon: e.target.value })} />
+//         <h3>EnterLabel</h3>
+//         <TextField label="Custom Label" fullWidth value={formValues.customLabel} onChange={(e) => setFormValues({ ...formValues, customLabel: e.target.value })} />
+//         <h3>Select the Icon</h3>
+//         <Select fullWidth value={formValues.icon} onChange={(e) => setFormValues({ ...formValues, icon: e.target.value })}>
+//             {iconOptions.map((option) => (
+//                 <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+//             ))}
+//         </Select>
+//         <Button variant="contained" onClick={addPoint}>Add Point</Button>
+
+//         <Button variant="contained" color="primary" onClick={downloadMap}>
+//     Download Map
+// </Button>
+
+//     </Box>
+// </Modal>
+
+<Modal open={true}>
+    <Box
+        sx={{
+            width: { xs: "90%", sm: "400px", md: "450px" }, // Adjust width based on screen size
+            height: { xs: "auto", md: "auto" }, // Auto height for better responsiveness
+            padding: "20px",
+            backgroundColor: "white",
+            position: "fixed",
+          top: "70%", right: "-250px",
+            transform: "translate(-50%, -50%)",
+            borderRadius: "10px", // Smooth rounded corners
+            boxShadow: 3, // Adds a subtle shadow
+            display: "flex",
+            flexDirection: "column",
+            gap: 2, // Adds spacing between elements
+            overflowY: "auto", // Enables scrolling if content overflows
+            maxHeight: "90vh", // Prevents overflowing the viewport
+        }}
+    >
         <Autocomplete
             options={searchResults}
             getOptionLabel={(option) => option.label}
             onInputChange={(event, newInputValue) => searchPlace(newInputValue)}
-            // onChange={(event, newValue) => {
-            //     if (newValue) {
-            //         setFormValues({
-            //             lat: newValue.lat.toString(),
-            //             lon: newValue.lon.toString(),
-            //             name: newValue.label,
-            //             icon: getDefaultIcon(newValue.label),
-            //         });
-            //     }
-            // }}
             onChange={(event, newValue) => {
                 if (newValue) {
                     setFormValues({
@@ -4898,41 +4955,36 @@ if (coords.length > 1) {
                         name: newValue.label,
                         icon: getDefaultIcon(newValue.label),
                     });
-            
+
                     // Move the map to the selected location
                     if (mapRef.current) {
                         mapRef.current.getView().animate({
                             center: fromLonLat([newValue.lon, newValue.lat]),
-                            zoom: 5, // Adjust zoom level as needed
-                            duration: 1000, // Smooth animation effect
+                            zoom: 5,
+                            duration: 1000,
                         });
                     }
                 }
             }}
-            
             renderInput={(params) => <TextField {...params} label="Search Places" fullWidth />}
         />
-        <h3>Enter Latitude</h3>
+
         <TextField label="Latitude" fullWidth value={formValues.lat} onChange={(e) => setFormValues({ ...formValues, lat: e.target.value })} />
-        <h3>Enter Longitude</h3>
         <TextField label="Longitude" fullWidth value={formValues.lon} onChange={(e) => setFormValues({ ...formValues, lon: e.target.value })} />
-        <h3>EnterLabel</h3>
         <TextField label="Custom Label" fullWidth value={formValues.customLabel} onChange={(e) => setFormValues({ ...formValues, customLabel: e.target.value })} />
-        <h3>Select the Icon</h3>
+
         <Select fullWidth value={formValues.icon} onChange={(e) => setFormValues({ ...formValues, icon: e.target.value })}>
             {iconOptions.map((option) => (
                 <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
             ))}
         </Select>
-        <Button variant="contained" onClick={addPoint}>Add Point</Button>
 
-        <Button variant="contained" color="primary" onClick={downloadMap}>
-    Download Map
-</Button>
-
+        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+            <Button variant="contained" onClick={addPoint} sx={{ flex: 1, mr: 1 }}>Add Point</Button>
+            <Button variant="contained" color="primary" onClick={downloadMap} sx={{ flex: 1 }}>Download Map</Button>
+        </Box>
     </Box>
 </Modal>
-
 
 
         ),
