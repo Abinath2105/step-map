@@ -4654,6 +4654,7 @@ import { Modal, Button, TextField, Box, Autocomplete, Select, MenuItem } from "@
 import defaultIcon from "../img/location.svg";
 import customIcon1 from "../img/ship.svg";
 import customIcon2 from "../img/flight.svg";
+import TileLayer from "ol/layer/Tile";
 import html2canvas from "html2canvas";
 const iconOptions = [
     { label: "Location", value: defaultIcon },
@@ -4696,36 +4697,7 @@ const useMapLogic = () => {
     const [searchResults, setSearchResults] = useState([]);
     const modifyInteractionRef = useRef(null);
 
-    // useEffect(() => {
-    //     if (!mapRef.current) return;
-
-    //     const vectorLayer = new VectorLayer({
-    //         source: vectorSourceRef.current,
-    //         zIndex: 1000,
-    //     });
-
-    //     mapRef.current.addLayer(vectorLayer);
-
-    //     modifyInteractionRef.current = new Modify({ source: vectorSourceRef.current });
-    //     mapRef.current.addInteraction(modifyInteractionRef.current);
-
-    //     const handleClick = (event) => {
-    //         const [lon, lat] = toLonLat(event.coordinate);
-    //         setFormValues({
-    //             lat: lat.toFixed(6),
-    //             lon: lon.toFixed(6),
-    //             name: `Point ${coordinates.length + 1}`,
-    //             icon: formValues.icon || defaultIcon,
-    //         });
-    //         setModalOpen(true);
-    //     };
-
-    //     mapRef.current.on("click", handleClick);
-
-    //     return () => {
-    //         mapRef.current.un("click", handleClick);
-    //     };
-    // }, [coordinates]);
+ 
 
     const downloadMap = async () => {
         if (!mapRef.current) return;
@@ -4740,6 +4712,9 @@ const useMapLogic = () => {
         });
     };
 
+
+
+    
     useEffect(() => {
         if (!mapRef.current) return;
     
@@ -4822,29 +4797,31 @@ if (coords.length > 1) {
     lineFeatureRef.current = straightLineFeature;
 }
     }
+   
     const addPoint = () => {
         const lat = parseFloat(formValues.lat);
         const lon = parseFloat(formValues.lon);
         if (isNaN(lat) || isNaN(lon)) return;
-
+    
         const coord = fromLonLat([lon, lat]);
         setCoordinates((prevCoords) => {
             const newCoords = [...prevCoords, coord];
             setPointLabels((prevLabels) => {
-                const newLabels = [...prevLabels, formValues.name];
-               
-
+                const newLabels = [...prevLabels, formValues.customLabel || formValues.name];
+    
                 setIconSelections((prevIcons) => {
-                                        const newIcons = [...prevIcons, formValues.icon || getDefaultIcon(formValues.name)];
-                                        updateRoute(newCoords, newLabels, newIcons);
-                                        return newIcons;
-                                    });
+                    const newIcons = [...prevIcons, formValues.icon || getDefaultIcon(formValues.name)];
+                    updateRoute(newCoords, newLabels, newIcons);
+                    return newIcons;
+                });
                 return newLabels;
             });
             return newCoords;
         });
         setModalOpen(false);
     };
+
+
 
     const searchPlace = async (query) => {
         if (!query) return;
@@ -4859,6 +4836,9 @@ if (coords.length > 1) {
         );
     };
 
+
+  
+    
     return {
         setMap: (map) => (mapRef.current = map),
         ModalComponent: (
@@ -4901,6 +4881,16 @@ if (coords.length > 1) {
             options={searchResults}
             getOptionLabel={(option) => option.label}
             onInputChange={(event, newInputValue) => searchPlace(newInputValue)}
+            // onChange={(event, newValue) => {
+            //     if (newValue) {
+            //         setFormValues({
+            //             lat: newValue.lat.toString(),
+            //             lon: newValue.lon.toString(),
+            //             name: newValue.label,
+            //             icon: getDefaultIcon(newValue.label),
+            //         });
+            //     }
+            // }}
             onChange={(event, newValue) => {
                 if (newValue) {
                     setFormValues({
@@ -4909,14 +4899,26 @@ if (coords.length > 1) {
                         name: newValue.label,
                         icon: getDefaultIcon(newValue.label),
                     });
+            
+                    // Move the map to the selected location
+                    if (mapRef.current) {
+                        mapRef.current.getView().animate({
+                            center: fromLonLat([newValue.lon, newValue.lat]),
+                            zoom: 5, // Adjust zoom level as needed
+                            duration: 1000, // Smooth animation effect
+                        });
+                    }
                 }
             }}
+            
             renderInput={(params) => <TextField {...params} label="Search Places" fullWidth />}
         />
         <h3>Enter Latitude</h3>
         <TextField label="Latitude" fullWidth value={formValues.lat} onChange={(e) => setFormValues({ ...formValues, lat: e.target.value })} />
         <h3>Enter Longitude</h3>
         <TextField label="Longitude" fullWidth value={formValues.lon} onChange={(e) => setFormValues({ ...formValues, lon: e.target.value })} />
+        <h3>EnterLabel</h3>
+        <TextField label="Custom Label" fullWidth value={formValues.customLabel} onChange={(e) => setFormValues({ ...formValues, customLabel: e.target.value })} />
         <h3>Select the Icon</h3>
         <Select fullWidth value={formValues.icon} onChange={(e) => setFormValues({ ...formValues, icon: e.target.value })}>
             {iconOptions.map((option) => (
@@ -4943,6 +4945,7 @@ export default useMapLogic;
 
 
 
+///above full updated codeeee     
 
 
 
@@ -4950,3 +4953,419 @@ export default useMapLogic;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React, { useEffect, useRef, useState } from "react";
+// import Map from "ol/Map";
+// import View from "ol/View";
+// import VectorLayer from "ol/layer/Vector";
+// import VectorSource from "ol/source/Vector";
+// import { Point, LineString } from "ol/geom";
+// import { Feature } from "ol";
+// import { fromLonLat, toLonLat } from "ol/proj";
+// import { Stroke, Style, Icon, Fill, Text } from "ol/style";
+// import { getDistance } from "ol/sphere";
+// import Modify from "ol/interaction/Modify";
+// import { Modal, Button, TextField, Box, Autocomplete, Select, MenuItem } from "@mui/material";
+// import defaultIcon from "../img/location.svg";
+// import customIcon1 from "../img/ship.svg";
+// import customIcon2 from "../img/flight.svg";
+// import TileLayer from "ol/layer/Tile";
+// import html2canvas from "html2canvas";
+// import { transform } from 'ol/proj';
+
+
+// const start = [longitude1, latitude1]; // Replace with actual values
+// const end = [longitude2, latitude2];   // Replace with actual values
+
+// const from = transform(start, 'EPSG:4326', 'EPSG:3857');
+// const to = transform(end, 'EPSG:4326', 'EPSG:3857');
+// const iconOptions = [
+//     { label: "Location", value: defaultIcon },
+//     { label: "Ship", value: customIcon1 },
+//     { label: "Flight", value: customIcon2 },
+// ];
+
+// const getDefaultIcon = (name) => {
+//     if (name.toLowerCase().includes("ship")) return customIcon1;
+//     if (name.toLowerCase().includes("flight")) return customIcon2;
+//     return defaultIcon;
+// };
+
+
+
+// // Function to capture and download the map
+
+
+
+
+
+// const getBezierCurve = (start, end, control, segments = 50) => {
+//     const coords = [];
+//     for (let i = 0; i <= segments; i++) {
+//         const t = i / segments;
+//         const x = (1 - t) ** 2 * start[0] + 2 * (1 - t) * t * control[0] + t ** 2 * end[0];
+//         const y = (1 - t) ** 2 * start[1] + 2 * (1 - t) * t * control[1] + t ** 2 * end[1];
+//         coords.push([x, y]);
+//     }
+//     return coords;
+// };
+
+
+
+// const interpolateCurve = (points, numSegments = 20) => {
+//     if (points.length < 2) return points;
+
+//     const result = [];
+//     for (let i = 0; i < points.length - 1; i++) {
+//         const p0 = points[i - 1] || points[i];
+//         const p1 = points[i];
+//         const p2 = points[i + 1] || points[i];
+//         const p3 = points[i + 2] || points[i + 1];
+
+//         for (let t = 0; t <= 1; t += 1 / numSegments) {
+//             const x = 0.5 * (
+//                 (2 * p1[0]) +
+//                 (-p0[0] + p2[0]) * t +
+//                 (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t * t +
+//                 (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t * t * t
+//             );
+
+//             const y = 0.5 * (
+//                 (2 * p1[1]) +
+//                 (-p0[1] + p2[1]) * t +
+//                 (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t * t +
+//                 (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t * t * t
+//             );
+
+//             result.push([x, y]);
+//         }
+//     }
+
+//     return result;
+// };
+
+
+
+
+// const generateGreatCircleArc = (start, end, segments = 50) => {
+//     const from = ol.proj.transform(start, 'EPSG:4326', 'EPSG:3857');
+//     const to = ol.proj.transform(end, 'EPSG:4326', 'EPSG:3857');
+
+//     const arcCoords = [];
+//     for (let i = 0; i <= segments; i++) {
+//         const t = i / segments;
+//         const lat = from[1] * (1 - t) + to[1] * t;
+//         const lon = from[0] * (1 - t) + to[0] * t;
+
+//         arcCoords.push([lon, lat]);
+//     }
+
+//     return arcCoords;
+// };
+
+// const useMapLogic = () => {
+//     const mapRef = useRef(null);
+//     const vectorSourceRef = useRef(new VectorSource());
+//     const lineFeatureRef = useRef(null);
+//     const [coordinates, setCoordinates] = useState([]);
+//     const [pointLabels, setPointLabels] = useState([]);
+//     const [iconSelections, setIconSelections] = useState([]);
+//     const [controlPoints, setControlPoints] = useState([]);
+//     const [modalOpen, setModalOpen] = useState(false);
+//     const [formValues, setFormValues] = useState({ lat: "", lon: "", name: "", icon: defaultIcon });
+//     const [searchResults, setSearchResults] = useState([]);
+//     const modifyInteractionRef = useRef(null);
+   
+    
+ 
+
+//     const isPointOnLand = async (coord) => {
+//         const [lon, lat] = ol.proj.transform(coord, 'EPSG:3857', 'EPSG:4326');
+//         const response = await fetch(`https://api.openstreetmap.org/ocean-check?lat=${lat}&lon=${lon}`);
+//         const { isLand } = await response.json();
+//         return isLand; // Returns true if land, false if ocean
+//     };
+    
+
+
+//     const adjustRouteForOcean = async (coords) => {
+//         const adjustedCoords = [];
+    
+//         for (const coord of coords) {
+//             let newCoord = coord;
+//             let tries = 0;
+    
+//             while (await isPointOnLand(newCoord) && tries < 10) {
+//                 newCoord = [newCoord[0] + Math.random() * 0.05, newCoord[1] - Math.random() * 0.05]; // Offset towards sea
+//                 tries++;
+//             }
+    
+//             adjustedCoords.push(newCoord);
+//         }
+    
+//         return adjustedCoords;
+//     };
+    
+
+
+//     const downloadMap = async () => {
+//         if (!mapRef.current) return;
+    
+//         const mapElement = mapRef.current.getViewport(); // Get the map viewport
+    
+//         html2canvas(mapElement, { useCORS: true }).then((canvas) => {
+//             const link = document.createElement("a");
+//             link.href = canvas.toDataURL("image/png"); // Convert to PNG
+//             link.download = "marked_map.png";
+//             link.click();
+//         });
+//     };
+
+
+
+    
+//     useEffect(() => {
+//         if (!mapRef.current) return;
+    
+//         const vectorLayer = new VectorLayer({
+//             source: vectorSourceRef.current,
+//             zIndex: 1000,
+//         });
+    
+//         mapRef.current.addLayer(vectorLayer);
+    
+//         modifyInteractionRef.current = new Modify({ source: vectorSourceRef.current });
+//         mapRef.current.addInteraction(modifyInteractionRef.current);
+    
+//         const handleClick = (event) => {
+//             const [lon, lat] = toLonLat(event.coordinate);
+//             setFormValues({
+//                 lat: lat.toFixed(6),
+//                 lon: lon.toFixed(6),
+//                 name: `Point ${coordinates.length + 1}`,
+//                 icon: formValues.icon || defaultIcon,
+//             });
+    
+//             // Ensure modal is always open and updates dynamically
+//             if (!modalOpen) setModalOpen(true);
+//         };
+    
+//         mapRef.current.on("click", handleClick);
+    
+//         return () => {
+//             mapRef.current.un("click", handleClick);
+//         };
+//     }, [coordinates]);
+    
+
+
+
+//     /**
+//      * Updates the route with curved paths and enables dragging
+//      */
+// //     const updateRoute = (coords, labels, icons) => {
+// //         vectorSourceRef.current.clear();
+
+// //         coords.forEach((coord, index) => {
+// //             const pointFeature = new Feature(new Point(coord));
+// //             pointFeature.setStyle(
+// //                 new Style({
+// //                     image: new Icon({ src: icons[index], scale: 0.05, anchor: [0.5, 1] }),
+// //                     text: new Text({
+// //                         text: labels[index] || `${index + 1}`,
+// //                         font: "bold 12px Arial",
+// //                         fill: new Fill({ color: "white" }),
+// //                         stroke: new Stroke({ color: "black", width: 2 }),
+// //                         offsetY: -20,
+// //                     }),
+// //                 })
+// //             );
+// //             vectorSourceRef.current.addFeature(pointFeature);
+// //         });
+
+
+
+
+// // if (coords.length > 1) {
+// //     let straightCoords = [...coords]; // Initial straight-line path
+
+// //     // Create the dotted line connection between points
+// //     const straightLineGeometry = new LineString(straightCoords);
+// //     const straightLineFeature = new Feature(straightLineGeometry);
+// //     straightLineFeature.setStyle(
+// //         new Style({
+// //             stroke: new Stroke({
+// //                 color: "blue",
+// //                 width: 2,
+// //                 lineDash: [5, 5], // Dotted line effect
+// //             }),
+// //         })
+// //     );
+
+// //     vectorSourceRef.current.addFeature(straightLineFeature);
+// //     lineFeatureRef.current = straightLineFeature;
+// // }
+// //     }
+   
+// const updateRoute = async (coords, labels, icons) => {
+//     vectorSourceRef.current.clear();
+
+//     for (let i = 0; i < coords.length - 1; i++) {
+//         let segmentCoords = generateGreatCircleArc(coords[i], coords[i + 1], 30);
+//         segmentCoords = await adjustRouteForOcean(segmentCoords); // Ensure route avoids land
+
+//         const curvedLineGeometry = new LineString(segmentCoords);
+//         const curvedLineFeature = new Feature(curvedLineGeometry);
+//         curvedLineFeature.setStyle(
+//             new Style({
+//                 stroke: new Stroke({
+//                     color: "blue",
+//                     width: 2,
+//                     lineDash: [5, 5], // Dotted curved line effect
+//                 }),
+//             })
+//         );
+
+//         vectorSourceRef.current.addFeature(curvedLineFeature);
+//     }
+
+//     coords.forEach((coord, index) => {
+//         const pointFeature = new Feature(new Point(coord));
+//         pointFeature.setStyle(
+//             new Style({
+//                 image: new Icon({ src: icons[index], scale: 0.05, anchor: [0.5, 1] }),
+//                 text: new Text({
+//                     text: labels[index] || `${index + 1}`,
+//                     font: "bold 12px Arial",
+//                     fill: new Fill({ color: "white" }),
+//                     stroke: new Stroke({ color: "black", width: 2 }),
+//                     offsetY: -20,
+//                 }),
+//             })
+//         );
+//         vectorSourceRef.current.addFeature(pointFeature);
+//     });
+// };
+
+
+//     const addPoint = () => {
+//         const lat = parseFloat(formValues.lat);
+//         const lon = parseFloat(formValues.lon);
+//         if (isNaN(lat) || isNaN(lon)) return;
+    
+//         const coord = fromLonLat([lon, lat]);
+//         setCoordinates((prevCoords) => {
+//             const newCoords = [...prevCoords, coord];
+//             setPointLabels((prevLabels) => {
+//                 const newLabels = [...prevLabels, formValues.customLabel || formValues.name];
+    
+//                 setIconSelections((prevIcons) => {
+//                     const newIcons = [...prevIcons, formValues.icon || getDefaultIcon(formValues.name)];
+//                     updateRoute(newCoords, newLabels, newIcons);
+//                     return newIcons;
+//                 });
+//                 return newLabels;
+//             });
+//             return newCoords;
+//         });
+//         setModalOpen(false);
+//     };
+
+
+
+//     const searchPlace = async (query) => {
+//         if (!query) return;
+//         const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
+//         const data = await response.json();
+//         setSearchResults(
+//             data.map((place) => ({
+//                 label: place.display_name,
+//                 lat: parseFloat(place.lat),
+//                 lon: parseFloat(place.lon),
+//             }))
+//         );
+//     };
+
+
+  
+    
+//     return {
+//         setMap: (map) => (mapRef.current = map),
+//         ModalComponent: (
+
+
+//  <Modal open={true}>
+//     <Box sx={{ width: "350px", height:"800px", padding: "20px", backgroundColor: "white", position: "fixed", top: "65%", right: "-250px", transform: "translate(-50%, -50%)" }}>
+//         <h3>Add a Point</h3>
+//         <h3>Enter location to Search</h3>
+//         <Autocomplete
+//             options={searchResults}
+//             getOptionLabel={(option) => option.label}
+//             onInputChange={(event, newInputValue) => searchPlace(newInputValue)}
+          
+//             onChange={(event, newValue) => {
+//                 if (newValue) {
+//                     setFormValues({
+//                         lat: newValue.lat.toString(),
+//                         lon: newValue.lon.toString(),
+//                         name: newValue.label,
+//                         icon: getDefaultIcon(newValue.label),
+//                     });
+            
+//                     // Move the map to the selected location
+//                     if (mapRef.current) {
+//                         mapRef.current.getView().animate({
+//                             center: fromLonLat([newValue.lon, newValue.lat]),
+//                             zoom: 5, // Adjust zoom level as needed
+//                             duration: 1000, // Smooth animation effect
+//                         });
+//                     }
+//                 }
+//             }}
+            
+//             renderInput={(params) => <TextField {...params} label="Search Places" fullWidth />}
+//         />
+//         <h3>Enter Latitude</h3>
+//         <TextField label="Latitude" fullWidth value={formValues.lat} onChange={(e) => setFormValues({ ...formValues, lat: e.target.value })} />
+//         <h3>Enter Longitude</h3>
+//         <TextField label="Longitude" fullWidth value={formValues.lon} onChange={(e) => setFormValues({ ...formValues, lon: e.target.value })} />
+//         <h3>EnterLabel</h3>
+//         <TextField label="Custom Label" fullWidth value={formValues.customLabel} onChange={(e) => setFormValues({ ...formValues, customLabel: e.target.value })} />
+//         <h3>Select the Icon</h3>
+//         <Select fullWidth value={formValues.icon} onChange={(e) => setFormValues({ ...formValues, icon: e.target.value })}>
+//             {iconOptions.map((option) => (
+//                 <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
+//             ))}
+//         </Select>
+//         <Button variant="contained" onClick={addPoint}>Add Point</Button>
+
+//         <Button variant="contained" color="primary" onClick={downloadMap}>
+//     Download Map
+// </Button>
+
+//     </Box>
+// </Modal>
+
+
+
+//         ),
+//     };
+// };
+
+// export default useMapLogic;
