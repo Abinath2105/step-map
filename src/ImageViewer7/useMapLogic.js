@@ -4932,7 +4932,7 @@ if (coords.length > 1) {
             padding: "20px",
             backgroundColor: "white",
             position: "fixed",
-          top: "70%", right: "-250px",
+          top: "50%", right: "-250px",
             transform: "translate(-50%, -50%)",
             borderRadius: "10px", // Smooth rounded corners
             boxShadow: 3, // Adds a subtle shadow
