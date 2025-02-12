@@ -4927,7 +4927,7 @@ if (coords.length > 1) {
 <Modal open={true}>
     <Box
         sx={{
-            width: { xs: "90%", sm: "400px", md: "450px" }, // Adjust width based on screen size
+            width: { xs: "90%", sm: "350px", md: "400px" }, // Adjust width based on screen size
             height: { xs: "auto", md: "auto" }, // Auto height for better responsiveness
             padding: "20px",
             backgroundColor: "white",
