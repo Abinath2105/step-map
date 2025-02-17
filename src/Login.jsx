@@ -111,7 +111,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
-
+import mapview from './img/mapview.mp4';
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -139,7 +139,7 @@ const Login = () => {
       </video> */}
 <video autoPlay loop muted playsInline className="background-video">
   <source
-    src="https://drive.google.com/uc?export=download&id=1I2fg2e7DBCvWVa_g1OTIfNfMP149pdik"
+    src={mapview}
     type="video/mp4"
   />
   Your browser does not support the video tag.
