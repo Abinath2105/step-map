@@ -111,7 +111,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
-import mapvideo from './img/map.mp4';
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -132,11 +132,18 @@ const Login = () => {
   return (
     <div className="login-container">
       {/* <video autoPlay loop muted className="background-video"> */}
-      <video autoPlay loop muted playsInline className="background-video">
+      {/* <video autoPlay loop muted playsInline className="background-video">
 
-        <source src={mapvideo} type="video/mp4" />
+        <source src="https://drive.google.com/file/d/1I2fg2e7DBCvWVa_g1OTIfNfMP149pdik/view?usp=sharing" type="video/mp4" />
         Your browser does not support the video tag.
-      </video>
+      </video> */}
+<video autoPlay loop muted playsInline className="background-video">
+  <source
+    src="https://drive.google.com/uc?export=download&id=1I2fg2e7DBCvWVa_g1OTIfNfMP149pdik"
+    type="video/mp4"
+  />
+  Your browser does not support the video tag.
+</video>
 
 
 
